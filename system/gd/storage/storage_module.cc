@@ -137,9 +137,9 @@ void StorageModule::SaveImmediately() {
     ASSERT(os::RenameFile(config_file_path_, config_backup_path_));
   }
   // 2. write in-memory config to disk, if failed, backup can still be used
-  ASSERT(LegacyConfigFile::FromPath(config_file_path_).Write(pimpl_->cache_));
+  ASSERT(LegacyConfigFile::FromPath(config_file_path_).Write(pimpl_->cache_)
   // 3. now write back up to disk as well
-  ASSERT(LegacyConfigFile::FromPath(config_backup_path_).Write(pimpl_->cache_));
+        || LegacyConfigFile::FromPath(config_backup_path_).Write(pimpl_->cache_));
   // 4. save checksum if it is running in common criteria mode
   if (bluetooth::os::ParameterProvider::GetBtKeystoreInterface() != nullptr &&
       bluetooth::os::ParameterProvider::IsCommonCriteriaMode()) {
