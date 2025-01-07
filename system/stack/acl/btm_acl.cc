@@ -59,6 +59,7 @@
 #include "rust/src/core/ffi/types.h"
 #include "stack/acl/acl.h"
 #include "stack/acl/peer_packet_types.h"
+#include "stack/btm/btm_ble_sec.h"
 #include "stack/btm/btm_dev.h"
 #include "stack/btm/btm_int_types.h"
 #include "stack/btm/btm_sco.h"
@@ -1052,6 +1053,16 @@ void StackAclBtmAcl::btm_establish_continue(tACL_CONN* p_acl) {
           default_packet_type_mask, p_acl->RemoteAddress());
     }
     btm_set_link_policy(p_acl, btm_cb.acl_cb_.DefaultLinkPolicy());
+  } else if (p_acl->is_transport_ble()) {
+    tBTM_SEC_DEV_REC* p_dev_rec = btm_find_dev(p_acl->remote_addr);
+
+    if (p_dev_rec == nullptr) {
+      log::warn("No security record for {}", p_acl->RemoteAddress());
+    } else if (p_dev_rec->sec_rec.is_le_link_key_known()) {
+      btm_ble_set_encryption(
+          p_acl->remote_addr, BTM_BLE_SEC_ENCRYPT,
+          p_dev_rec->role_central ? HCI_ROLE_CENTRAL : HCI_ROLE_PERIPHERAL);
+    }
   }
   NotifyAclLinkUp(*p_acl);
 }
