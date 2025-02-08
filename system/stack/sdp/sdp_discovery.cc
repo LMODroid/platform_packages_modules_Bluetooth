@@ -179,7 +179,7 @@ static void sdp_snd_service_search_req(tCONN_CB* p_ccb, uint8_t cont_len,
 
   if (L2CA_DataWrite(p_ccb->connection_id, p_cmd) != L2CAP_DW_SUCCESS) {
     log::warn("Unable to write L2CAP data peer:{} cid:{} len:{}",
-              p_ccb->device_address, p_ccb->connection_id, p_cmd->len);
+              p_ccb->device_address, p_ccb->connection_id, p - p_start);
   }
 
   /* Start inactivity timer */
@@ -689,7 +689,7 @@ static void process_service_search_attr_rsp(tCONN_CB* p_ccb, uint8_t* p_reply,
 
     if (L2CA_DataWrite(p_ccb->connection_id, p_msg) != L2CAP_DW_SUCCESS) {
       log::warn("Unable to write L2CAP data peer:{} cid:{} len:{}",
-                p_ccb->device_address, p_ccb->connection_id, p_msg->len);
+                p_ccb->device_address, p_ccb->connection_id, p - p_start);
     }
 
     /* Start inactivity timer */
@@ -863,7 +863,7 @@ static void process_service_attr_rsp(tCONN_CB* p_ccb, uint8_t* p_reply,
 
     if (L2CA_DataWrite(p_ccb->connection_id, p_msg) != L2CAP_DW_SUCCESS) {
       log::warn("Unable to write L2CAP data peer:{} cid:{} len:{}",
-                p_ccb->device_address, p_ccb->connection_id, p_msg->len);
+                p_ccb->device_address, p_ccb->connection_id, p - p_start);
     }
 
     /* Start inactivity timer */

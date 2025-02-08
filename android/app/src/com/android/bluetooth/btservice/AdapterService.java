@@ -18,6 +18,7 @@
 package com.android.bluetooth.btservice;
 
 import static android.bluetooth.BluetoothDevice.BATTERY_LEVEL_UNKNOWN;
+import static android.bluetooth.BluetoothDevice.BOND_NONE;
 import static android.bluetooth.BluetoothDevice.TRANSPORT_AUTO;
 import static android.bluetooth.IBluetoothLeAudio.LE_AUDIO_GROUP_ID_INVALID;
 import static android.text.format.DateUtils.MINUTE_IN_MILLIS;
@@ -6088,6 +6089,13 @@ public class AdapterService extends Service {
             mCsipSetCoordinatorService.handleBondStateChanged(device, fromState, toState);
         }
         mDatabaseManager.handleBondStateChanged(device, fromState, toState);
+
+        if (toState == BOND_NONE) {
+            // Remove the permissions for unbonded devices
+            setMessageAccessPermission(device, BluetoothDevice.ACCESS_UNKNOWN);
+            setPhonebookAccessPermission(device, BluetoothDevice.ACCESS_UNKNOWN);
+            setSimAccessPermission(device, BluetoothDevice.ACCESS_UNKNOWN);
+        }
     }
 
     static int convertScanModeToHal(int mode) {
