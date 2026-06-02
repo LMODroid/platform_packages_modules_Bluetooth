@@ -25,6 +25,7 @@ import static android.bluetooth.BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERA
 import static android.bluetooth.BluetoothAdapter.SCAN_MODE_NONE;
 import static android.bluetooth.BluetoothAdapter.nameForState;
 import static android.bluetooth.BluetoothDevice.BATTERY_LEVEL_UNKNOWN;
+import static android.bluetooth.BluetoothDevice.BOND_BONDED;
 import static android.bluetooth.BluetoothDevice.BOND_NONE;
 import static android.bluetooth.BluetoothProfile.CONNECTION_POLICY_ALLOWED;
 import static android.bluetooth.BluetoothProfile.CONNECTION_POLICY_FORBIDDEN;
@@ -4226,7 +4227,7 @@ public class AdapterService extends Service {
         }
         mDatabaseManager.handleBondStateChanged(device, fromState, toState);
 
-        if (toState == BOND_NONE) {
+        if (toState == BOND_NONE || fromState == BOND_BONDED) {
             // Remove the permissions for unbonded devices
             setMessageAccessPermission(device, BluetoothDevice.ACCESS_UNKNOWN);
             setPhonebookAccessPermission(device, BluetoothDevice.ACCESS_UNKNOWN);

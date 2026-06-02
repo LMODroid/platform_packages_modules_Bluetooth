@@ -1366,8 +1366,8 @@ static bool btm_sec_is_upgrade_possible(tBTM_SEC_DEV_REC* p_dev_rec, bool is_ori
 
     /*if authentication is requirement & currently on temp bonding
      * trigger pairing */
-    if (com::android::bluetooth::flags::upgrade_temp_bonding_on_auth_req() &&
-        (p_dev_rec->sec_rec.security_required & BTM_SEC_OUT_AUTHENTICATE) &&
+    if ((p_dev_rec->sec_rec.security_required &
+         (is_originator ? BTM_SEC_OUT_AUTHENTICATE : BTM_SEC_IN_AUTHENTICATE)) &&
         p_dev_rec->sec_rec.is_bond_type_temporary()) {
       is_possible = true;
     }
@@ -4225,7 +4225,7 @@ static void btm_sec_pairing_timeout(void* /* data */) {
 
   p_dev_rec = btm_find_dev(p_cb->pairing_bda);
 
-  log::verbose("State: {}   Flags: {}", tBTM_SEC_CB::btm_pair_state_descr(p_cb->pairing_state),
+  log::warn("State: {}   Flags: {}", tBTM_SEC_CB::btm_pair_state_descr(p_cb->pairing_state),
                p_cb->pairing_flags);
 
   switch (p_cb->pairing_state) {
@@ -4289,6 +4289,10 @@ static void btm_sec_pairing_timeout(void* /* data */) {
       break;
 
     case BTM_PAIR_STATE_WAIT_AUTH_COMPLETE:
+      if (btm_sec_cb.pairing_flags & BTM_PAIR_FLAGS_LE_ACTIVE) {
+        SMP_PairCancel(p_cb->pairing_bda);
+      }
+      FALLTHROUGH_INTENDED;
     case BTM_PAIR_STATE_GET_REM_NAME:
       /* We need to notify the UI that timeout has happened while waiting for
        * authentication*/
