@@ -40,6 +40,7 @@ import android.bluetooth.BluetoothProfile;
 import android.bluetooth.IBluetoothCallback;
 import android.companion.CompanionDeviceManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
@@ -1039,5 +1040,19 @@ public class AdapterServiceTest {
         doReturn(new byte[0]).when(mNativeInterface).dumpMetrics();
         mAdapterService.dump(fd, writer, new String[] {"--proto-bin"});
         mAdapterService.dump(fd, writer, new String[] {"random", "arguments"});
+    }
+
+    @Test
+    public void testRemovePermissionBondedToBonding() {
+        SharedPreferences mockPreferences = mock(SharedPreferences.class);
+        SharedPreferences.Editor mockEditor = mock(SharedPreferences.Editor.class);
+
+        when(mMockContext.getSharedPreferences(anyString(), anyInt())).thenReturn(mockPreferences);
+        when(mockPreferences.edit()).thenReturn(mockEditor);
+
+        mAdapterService.handleBondStateChanged(
+                mDevice, BluetoothDevice.BOND_BONDED, BluetoothDevice.BOND_BONDING);
+
+        verify(mockEditor, times(3)).remove(anyString());
     }
 }
